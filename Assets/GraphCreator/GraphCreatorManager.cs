@@ -7,6 +7,7 @@ using System.Linq;
 using TMPro;
 public class GraphCreatorManager : MonoBehaviour
 {
+    public Progress p;
     public SimpleGraph simpleGraph;
     public GameObject nodePrefab;
     public List<GameObject> visualNodes;
@@ -133,7 +134,9 @@ public class GraphCreatorManager : MonoBehaviour
     public void OnCheckChromaValues() {
         if(simpleGraph.nodes.Count==0) return;
 
+        //new System.Threading.Thread(simpleGraph.getVertexChromaIndex).Start();
         simpleGraph.getVertexChromaIndex();
+        //return;
         if(simpleGraph.vertexChromaIndex==-1) {
             chromaText.text="Sth Broke";
         }
@@ -142,4 +145,12 @@ public class GraphCreatorManager : MonoBehaviour
                 Graph.NicelyFormatedIntList(simpleGraph.vertexChromaIndexAssignment);
     }
     #endregion
+}
+[System.Serializable]
+public class Progress{
+    public int x;
+    public int y;
+    public int z;
+    [Range(0,1)]
+    public double pgr;
 }

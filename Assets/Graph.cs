@@ -121,6 +121,7 @@ public class Connection {
 public enum Hamiltonowskosc { full, partial, none }
 [System.Serializable]
 public class SimpleGraph {
+    public Progress p=new Progress();
     // Start is called before the first frame update
     public List<SimpleNode> nodes=new List<SimpleNode>();
     public Hamiltonowskosc hamiltonowskosc=Hamiltonowskosc.none;
@@ -170,6 +171,9 @@ public class SimpleGraph {
             assignment[i] = 0;
 
         while(!satisfied) {
+
+            p.y++;
+            p.pgr = 1.0 * p.y / p.z;
             satisfied = ValidateAssignment(assignment);
             if(!satisfied) {//move to next assignment
                 assignment[0]++;
@@ -182,6 +186,9 @@ public class SimpleGraph {
                 if(assignment[nodes.Count] >= 1) {//end of possibilities for given chroma indexes
                     totalChromaIndexes++;
                     assignment[nodes.Count] = 0;
+                    p.y = 0;
+                    p.z = (int)Mathf.Pow(totalChromaIndexes, nodes.Count());
+                    p.x = totalChromaIndexes;
                 }
             }
             if(totalChromaIndexes > nodes.Count) {
