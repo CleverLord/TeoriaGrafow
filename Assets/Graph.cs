@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System;
 
 //Classes for Dijkstra
 
 [System.Serializable]
 public class Graph {
+    [System.NonSerialized]
+    public Dictionary<int,List<Connection>> nodesRelatedConnections=new Dictionary<int, List<Connection>>();//only for coloring edges
+
     public int head=-1;
     public List<Node> nodes=new List<Node>();
     public List<Connection> connections=new List<Connection>();
@@ -111,7 +115,18 @@ public class Connection {
             return fromNode;
         }
         return -1;
-
+    }
+    public bool isSimilar(Connection other) {
+        if(other.fromNode == fromNode && other.toNode == toNode)
+            return true;
+        if(other.fromNode == toNode && other.toNode == fromNode)
+            return true;
+        return false;
+    }
+    public bool relatedWithNode(int node) {
+        if(fromNode == node || toNode == node)
+            return true;
+        return false;
     }
 }
 
@@ -126,8 +141,6 @@ public class SimpleGraph {
     public List<SimpleNode> nodes=new List<SimpleNode>();
     public Hamiltonowskosc hamiltonowskosc=Hamiltonowskosc.none;
     public List<int> hamiltonowskiPath=new List<int>();
-    public int vertexChromaIndex;
-    public List<int> vertexChromaIndexAssignment;
     public void CheckHamiltonowskosc() {
         foreach(SimpleNode firstNode in nodes) {
             int[] path=new int[2];
@@ -162,56 +175,24 @@ public class SimpleGraph {
             }
         }
     }
-    public void getVertexChromaIndex() {
-        bool satisfied=false;
-        int totalChromaIndexes=1;
-        int[] assignment=new int[nodes.Count+1];
 
-        for(int i = 0; i < assignment.Length; i++)
-            assignment[i] = 0;
-
-        while(!satisfied) {
-
-            p.y++;
-            p.pgr = 1.0 * p.y / p.z;
-            satisfied = ValidateAssignment(assignment);
-            if(!satisfied) {//move to next assignment
-                assignment[0]++;
-                for(int i = 0; i < nodes.Count; i++) {
-                    if(assignment[i] >= totalChromaIndexes) {
-                        assignment[i] = 0;
-                        assignment[i + 1]++;
-                    }
-                }
-                if(assignment[nodes.Count] >= 1) {//end of possibilities for given chroma indexes
-                    totalChromaIndexes++;
-                    assignment[nodes.Count] = 0;
-                    p.y = 0;
-                    p.z = (int)Mathf.Pow(totalChromaIndexes, nodes.Count());
-                    p.x = totalChromaIndexes;
-                }
-            }
-            if(totalChromaIndexes > nodes.Count) {
-                Debug.Log("Coś zepsułem");
-                break;
+    public Graph Upgraded() {
+        Graph adv=new Graph();
+        foreach(SimpleNode sn in nodes)
+            adv.AddNode(Vector3.right*sn.nodeID);
+        foreach(SimpleNode sn in nodes) {
+            foreach(int a in sn.connections) {
+                Connection c=new Connection(sn.nodeID,a,false);
+                Connection c2=adv.connections.FirstOrDefault(cc=>cc.isSimilar(c));
+                if(c2 != null)
+                    c2.bidirectional = true;
+                else
+                    adv.connections.Add(c);
             }
         }
-        vertexChromaIndex = totalChromaIndexes;
-        vertexChromaIndexAssignment = new List<int>(assignment);
-        vertexChromaIndexAssignment.RemoveAt(nodes.Count);
+        return adv;
     }
-    bool ValidateAssignment(int[] assignment) {
-        for(int i = 0; i < nodes.Count; i++) {
-            SimpleNode sm=nodes[i];
-            int selfColor=assignment[i];
-            foreach(int c in sm.connections) {
-                int otherColor=assignment[c];
-                if(selfColor == otherColor)
-                    return false;
-            }
-        }
-        return true;
-    }
+
 }
 
 [System.Serializable]
