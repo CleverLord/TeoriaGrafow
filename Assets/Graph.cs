@@ -177,15 +177,20 @@ public class SimpleGraph {
     }
 
     public Graph Upgraded() {
+        int x=0;
         Graph adv=new Graph();
-        foreach(SimpleNode sn in nodes)
-            adv.AddNode(Vector3.right*sn.nodeID);
+        foreach(SimpleNode sn in nodes) {
+            adv.AddNode(Vector3.right * sn.nodeID);
+            sn.connections.Sort();
+        }
         foreach(SimpleNode sn in nodes) {
             foreach(int a in sn.connections) {
-                Connection c=new Connection(sn.nodeID,a,false);
+                Connection c=new Connection(sn.nodeID,a,false){ connectionID=x++};
                 Connection c2=adv.connections.FirstOrDefault(cc=>cc.isSimilar(c));
-                if(c2 != null)
+                if(c2 != null) {
                     c2.bidirectional = true;
+                    x--;
+                }
                 else
                     adv.connections.Add(c);
             }

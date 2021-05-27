@@ -12,11 +12,11 @@ public class GraphCreatorManager : MonoBehaviour
 
     public int liczbaChromatyczna=-1;
     public List<int> vertexChromaIndexAssignment = new List<int>();
-    [Range(0,1000)]
-    public int skipper=2;
-    public int skp=0;
+    [Header("Indeks chromatyczny")]
     public int indexChromatyczny=-1;
+    public List<Connection> floatingConnections;
     public List<EdgeChromaAssignment> indexChromaIndexAssignment = new List<EdgeChromaAssignment>();
+    [Header("Inne")]
     public GameObject nodePrefab;
     public List<GameObject> visualNodes;
     public string editorFile;
@@ -28,7 +28,8 @@ public class GraphCreatorManager : MonoBehaviour
     public float arrowOffset=0.1f;
     public TextMeshProUGUI hamiltonowskoscText;
     public TextMeshProUGUI chromaText;
-
+    public TextMeshProUGUI chromaText2;
+    string summary="";
     void Start() {
         
     }
@@ -210,7 +211,12 @@ public class GraphCreatorManager : MonoBehaviour
         liczbaChromatyczna = -1;
         advGraph = simpleGraph.Upgraded();
         RegenNodeConnectionsPairs();
-        StartCoroutine(GetIndeksChromatyczyCrt());
+        new System.Threading.Thread(GetIndeksChromatyczyCrt).Start();
+        StartCoroutine(painter());
+    }
+    public IEnumerator painter() {
+        yield return new WaitWhile(()=>indexChromatyczny == -1);
+        chromaText2.text = summary;
     }
     public void RegenNodeConnectionsPairs() {
         foreach(Node n in advGraph.nodes) {
@@ -222,15 +228,13 @@ public class GraphCreatorManager : MonoBehaviour
             advGraph.nodesRelatedConnections.Add(n.nodeID, cs);
         }
     }
-    public IEnumerator GetIndeksChromatyczyCrt() {
-        yield return new WaitForEndOfFrame();
+    public void GetIndeksChromatyczyCrt() {
 
-        bool satisfied=false;
-        int totalChromaIndexes=1;
+        int totalChromaIndexes=0;
         foreach(SimpleNode sn in simpleGraph.nodes)
             totalChromaIndexes = Mathf.Max(totalChromaIndexes, sn.connections.Count());
 
-        List<Connection> floatingConnections=advGraph.connections;
+        floatingConnections= new List<Connection>( advGraph.connections);
         indexChromaIndexAssignment = new List<EdgeChromaAssignment>();
 
         foreach(SimpleNode sn in simpleGraph.nodes)
@@ -246,64 +250,78 @@ public class GraphCreatorManager : MonoBehaviour
             }
 
         foreach(SimpleNode sn in simpleGraph.nodes) {
-            nodesColorslists.Add(new List<int>());
+            nodesColorslists.Add(new NodesColorLists());
         }
 
         if(!ValidateIndexPartialAssignment(indexChromaIndexAssignment)) {
             Debug.Log("CosZepsułem");
-            yield break;
+            return;
         }
 
         while(indexChromatyczny==-1) {
-            StartCoroutine(GetIndeksChromatyczySubCrt(indexChromaIndexAssignment, floatingConnections, totalChromaIndexes));
-            totalChromaIndexes++;
-            yield return new WaitForEndOfFrame();
+        totalChromaIndexes++;
+            GetIndeksChromatyczySubCrt(indexChromaIndexAssignment, floatingConnections, totalChromaIndexes);
+            if(totalChromaIndexes >= advGraph.connections.Count()) {
+                Debug.Log("CosZepsułem");
+                return;
+            }
         }
+
+        summary= "Indeks chromatyczny wynosi";
+        foreach(EdgeChromaAssignment ech in indexChromaIndexAssignment) {
+            summary += $"From node:{ech.c.fromNode} to node: {ech.c.toNode} paint with color {ech.color}\n";
+            //summary += $"Nodes:{ech.c.fromNode} -> {ech.c.toNode} color:{ech.color}\n";
+        }
+
             //validate
             //if valid and not all floating conenctions not empty
-                //make podstawienie
-                //validate
-                    //if valid and not all floating conenctions not empty
-                    // ... wiadomo co dalej
+            //make podstawienie
+            //validate
+            //if valid and not all floating conenctions not empty
+            // ... wiadomo co dalej
     }
-    public IEnumerator GetIndeksChromatyczySubCrt(List<EdgeChromaAssignment> assignment, List<Connection> floatingConnections,int totalChromaIndexes) {
+    public void GetIndeksChromatyczySubCrt(List<EdgeChromaAssignment> assignment, List<Connection> floatingConnections,int totalChromaIndexes) {
         if(floatingConnections.Count() == 0) { //success - no free connection and assignment is valid
             indexChromatyczny = totalChromaIndexes;
-            yield break;
+            return;
         }
         Connection c=floatingConnections.Last();                                                                //pick a connection
         floatingConnections.Remove(c);                                                                          //remove from floating
         EdgeChromaAssignment ech=new EdgeChromaAssignment(){c=c,color=0};                                       //create new assignment part
-        assignment.Add(ech);                                                                                    //add it
+        indexChromaIndexAssignment.Add(ech);                                                                    //add it
         for(int i = 0; i < totalChromaIndexes && indexChromatyczny==-1 ; i++){                                  //move through all colors only if assignment has not been found yet
-            ech.color = 0;                                                                                      //
-            if(ValidateIndexPartialAssignment(assignment))
-                yield return StartCoroutine(GetIndeksChromatyczySubCrt(assignment, floatingConnections, totalChromaIndexes));
+            //Nie działa
+            ech.color = i;
+            //Działa
+            indexChromaIndexAssignment[indexChromaIndexAssignment.Count() - 1].color = i;                                                                                     //
+            //Debug.Log($"Looking at connection {c.connectionID} with color {i}");
+            if(ValidateIndexPartialAssignment(indexChromaIndexAssignment))
+                GetIndeksChromatyczySubCrt(indexChromaIndexAssignment, floatingConnections, totalChromaIndexes);
+        }
+        if(floatingConnections.Count() == 0) { //success - no free connection and assignment is valid
+            indexChromatyczny = totalChromaIndexes;
+            return;
         }
         //no valid assignment in this subtree
         floatingConnections.Add(c);
-        assignment.Remove(ech);
-
-        if(skp == skipper) {
-            yield return new WaitForEndOfFrame();
-            skp = 0;
-        }
-        else
-            skp++;
+        indexChromaIndexAssignment.RemoveAt(indexChromaIndexAssignment.Count()-1);
     }
-    List<List<int>> nodesColorslists=new List<List<int>>();
-    
+    public List<NodesColorLists> nodesColorslists=new List<NodesColorLists>();
+    public ulong times=0;
     bool ValidateIndexPartialAssignment(List<EdgeChromaAssignment> eca) {
-        foreach(List<int> lista in nodesColorslists)
-            lista.Clear();
-
+        times++;
+        foreach(NodesColorLists lista in nodesColorslists)
+            lista.n.Clear();
+        bool f=false;
         foreach(EdgeChromaAssignment ec in eca) {
-            if(nodesColorslists[ec.c.fromNode].Contains(ec.color))
+            if(nodesColorslists[ec.c.fromNode].n.Contains(ec.color))
                 return false;
-            if(nodesColorslists[ec.c.toNode].Contains(ec.color))
+            if(nodesColorslists[ec.c.toNode].n.Contains(ec.color))
                 return false;
-            nodesColorslists[ec.c.fromNode].Add(ec.color);
-            nodesColorslists[ec.c.toNode].Add(ec.color);
+            nodesColorslists[ec.c.fromNode].n.Add(ec.color);
+            nodesColorslists[ec.c.toNode].n.Add(ec.color);
+            if(f)
+                return false;
         }
 
         return true;
@@ -311,6 +329,10 @@ public class GraphCreatorManager : MonoBehaviour
     
     #endregion
     #endregion
+}
+[System.Serializable]
+public class NodesColorLists {
+    public List<int> n=new List<int>();
 }
 [System.Serializable]
 public class EdgeChromaAssignment {
