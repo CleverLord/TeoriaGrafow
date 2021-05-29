@@ -6,7 +6,7 @@ using TMPro;
 using System;
 using System.Globalization;
 
-public class ActivityReporter : MonoBehaviour
+public class MySampleClass : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
