@@ -4,6 +4,8 @@
 
 Części nieprogramistyczne są zawarte w PDF'ie na samym wierzchu repozytorium
 
+Interesująca część kodu jest pod linkiem
+
 ---
 ## Uruchomienie:
 ### Uruchomić projekt można na 2 sposoby:
@@ -18,7 +20,7 @@ Części nieprogramistyczne są zawarte w PDF'ie na samym wierzchu repozytorium
 * pobrać zipa, rozpakować, uruchomić exe'ka
 ## Testowanie:
 * wcisnąć przycisk ze słowem Dijkstra
-* kliknąć przycisk Perform, a następnie przyciksk "play" wielokrotnie
+* kliknąć przycisk Perform, a następnie przycisk "play" wielokrotnie
 * można wgrać własnego JSON'a powtórzyć krok 2
 ## Wgrywanie własnego JSON'a
 W projekcie jest wbudowany graficzny kreator grafów, zaleca się kożystanie z niego.
