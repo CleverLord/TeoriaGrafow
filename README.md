@@ -4,7 +4,7 @@
 
 Części nieprogramistyczne są zawarte w PDF'ie na samym wierzchu repozytorium
 
-Interesująca część kodu znajduje się [tu](../master/Assets/Dijkstra/Scripts/DijkstraManager.cs), od momentu kiedy zaczynają się komentarze w kodzie (aktualnie linijka 121)
+Interesująca część kodu znajduje się [tu](../master/Assets/Dijkstra/Scripts/DijkstraCoreAlgorithm.cs), od momentu kiedy zaczynają się komentarze w kodzie (aktualnie linijka 121)
 
 ---
 ## Uruchomienie:
