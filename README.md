@@ -24,7 +24,9 @@ Należy przeczytać instrukcje sterowania zawarte z lewej strony ekranu
 Po każdej zmianie JSON jest generowany, dzięki czemu można go zapisać, ewentualnie zmodyfikować i wgrać ponownie przy pomocy pola tekstowego poniżej
 ### Format JSON'a
 Generowanie JSON'a ręczne wcale nie jest takie przyjemne
-Przy wczytywaniu jest regenerowana klasa Graph. Składa się ona z listy klasy Node oraz listy klasy Connection. Każdy Node posiada identyfikator oraz współrzędne w przestrzeni
+Przy wczytywaniu jest regenerowana klasa Graph. Składa się ona z listy klasy Node oraz listy klasy Connection. Każdy Node posiada identyfikator oraz współrzędne w przestrzeni. Pozycja jest określona w płaszczyźnie XZ, gdzie X jest "w prawo" a Z "w górę". Zmienna ta nie jest wymagana do poprawnego działania algorytmu i nie trzeba jej podawać.
+Zmienne w Connection mówią za siebie. Zmienna Head wybiera wierzchołek początkowy z pasującym identyfikatorem.
+Przykładowy JSON:
 ```{
     "head": 0,
     "nodes": [
@@ -99,4 +101,21 @@ Przy wczytywaniu jest regenerowana klasa Graph. Składa się ona z listy klasy N
         }
     ]
 }
+```
+Takie uproszczone wierzchołki też działają:
+```
+    "nodes": [
+        {
+            "nodeID": 0,
+        },
+        {
+            "nodeID": 1,
+        },
+        {
+            "nodeID": 2,
+        },
+        {
+            "nodeID": 3,
+        }
+    ]
 ```
