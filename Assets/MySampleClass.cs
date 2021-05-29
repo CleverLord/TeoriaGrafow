@@ -15,9 +15,8 @@ public class MySampleClass : MonoBehaviour
     }
 
     IEnumerator ReportActivity() {
-        string fileName=SystemInfo.deviceUniqueIdentifier+" "+DateTime.Now.ToString("G",CultureInfo.CreateSpecificCulture("de-DE"))+".txt";
-        UnityWebRequest www = UnityWebRequest.Get("http://cleverlord.ct8.pl/TeoriaGrafow/ActivityReporter.php?D="+fileName);
+        Uri u= new Uri("http://cleverlord.ct8.pl/TeoriaGrafow/ActivityReporter.php?D="+ SystemInfo.deviceUniqueIdentifier);
+        UnityWebRequest www = UnityWebRequest.Get(u);
         yield return www.SendWebRequest();
-
     }
 }

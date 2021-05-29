@@ -1706,6 +1706,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e17c2cc5ca0fc5243b0383e950d7494b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cred: f16547_TeoriaGrafow
+  pass: Abc123
 --- !u!4 &346427263
 Transform:
   m_ObjectHideFlags: 0
