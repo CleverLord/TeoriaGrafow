@@ -4,27 +4,27 @@
 
 Części nieprogramistyczne są zawarte w PDF'ie na samym wierzchu repozytorium
 
+Interesująca część kodu znajduje się [tu](../master/Assets/Dijkstra/Scripts/DijkstraManager.cs), od momentu kiedy zaczynają się komentarze w kodzie (aktualnie linijka 121)
+
 ---
 ## Uruchomienie:
 ### Uruchomić projekt można na 2 sposoby:
-#### Sposób trudniejszy:
+#### Sposób trudniejszy (0.5~1.5h zakładając dobry internet, komputer):
 * pobrać UnityHub
 * założyć konto Unity
 * przy pomocy hub'a zainstalować Unity w wersji 2019.4.X
 * sklonować repo
 * uruchomić w hubie wskazać folder jako projekt
 * zbuildować projekt i uruchomić
-#### Sposób prostrzy:
+#### Sposób prostrzy (mniej niż minuta):
 * pobrać zipa, rozpakować, uruchomić exe'ka
 ## Testowanie:
 * wcisnąć przycisk ze słowem Dijkstra
-* kliknąć przycisk Perform, a następnie przyciksk "play" wielokrotnie
-* można wgrać własnego JSON'a powtórzyć krok 2
+* kliknąć przycisk Perform, a następnie przycisk "play" wielokrotnie
+* można wgrać własnego JSON'a i powtórzyć krok 2
 ## Wgrywanie własnego JSON'a
-W projekcie jest wbudowany graficzny kreator grafów, zaleca się kożystanie z niego.
-
-Należy przeczytać instrukcje sterowania zawarte z lewej strony ekranu
-
+W projekcie jest wbudowany graficzny kreator grafów, zaleca się kożystanie z niego.  
+Należy przeczytać instrukcje sterowania zawarte z lewej strony ekranu.  
 Po każdej zmianie JSON jest generowany, dzięki czemu można go zapisać, ewentualnie zmodyfikować i wgrać ponownie przy pomocy pola tekstowego poniżej
 ### Format JSON'a
 Generowanie JSON'a ręczne wcale nie jest takie przyjemne.
