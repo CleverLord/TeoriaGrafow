@@ -12,6 +12,7 @@ using System.IO;
 public class ErrorReporter : MonoBehaviour
 {
     string deviceID="";
+    public string cred,pass;
     public static ErrorReporter singleton;
     public static bool working=false;
     public static string toSend="";
@@ -40,7 +41,7 @@ public class ErrorReporter : MonoBehaviour
             string fileName=deviceID+" "+DateTime.Now.ToString("G",CultureInfo.CreateSpecificCulture("de-DE"))+".txt";
             FtpWebRequest request = (FtpWebRequest)WebRequest.Create(new Uri(string.Format("{0}/{1}", "ftp://s1.ct8.pl", fileName)));
             request.Method = WebRequestMethods.Ftp.UploadFile;
-            request.Credentials = new NetworkCredential("f16547_TeoriaGrafow", "Abc123");
+            request.Credentials = new NetworkCredential(cred, pass);
             Stream ftpStream = request.GetRequestStream();
             Stream fs = GenerateStreamFromString(toSend);
             byte[] buffer = new byte[1024];
