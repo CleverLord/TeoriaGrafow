@@ -20,7 +20,7 @@ public class Graph {
         return nodes.FirstOrDefault(n => n.nodeID == ID);
     }
     public void AddNode(Vector3 position) {
-        nodes.Add(new Node(firstFreeNodeID) { graphIBelongTo = this, floatingPosition = position });
+        nodes.Add(new Node(firstFreeNodeID, this) { floatingPosition = position });
     }
     public void DeleteNode(int nodeID) {
         nodes=nodes.Where(n=>n.nodeID!=nodeID).ToList();
@@ -65,8 +65,9 @@ public class Node {
     public static Vector3Int fromV3(Vector3 v3) {
         return new Vector3Int((int)v3.x, (int)v3.y, (int)v3.z);
     }
-    public Node(int vertexID) {
+    public Node(int vertexID, Graph graphIBelongTo) {
         nodeID = vertexID;
+        this.graphIBelongTo = graphIBelongTo;
 
     }
     public List<Connection> myOutcommingConnections {
@@ -123,7 +124,7 @@ public class Connection {
             return true;
         return false;
     }
-    public bool relatedWithNode(int node) {
+    public bool isRelated(int node) {
         if(fromNode == node || toNode == node)
             return true;
         return false;

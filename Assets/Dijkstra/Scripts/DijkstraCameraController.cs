@@ -36,7 +36,7 @@ public class DijkstraCameraController : MonoBehaviour {
         ProcessUpdateJSON();
     }
     void ProcessUpdateJSON() {
-        if(Input.GetKeyUp(KeyCode.Mouse0) || Input.GetKeyUp(KeyCode.Mouse0))
+        if(Input.GetKeyUp(KeyCode.Mouse0) || Input.GetKeyUp(KeyCode.Mouse1))
             dm.UpdateJSON();
     }
     void ProcessMove() {

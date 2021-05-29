@@ -28,13 +28,14 @@ public class DijkstraManager : MonoBehaviour {
     }
     public void LoadJSON() {
         try {
-            Debug.Log(graphJsonIn.text);
             Graph g= JsonUtility.FromJson<Graph>(graphJsonIn.text);
             if(isInputValid(g)) {
                 graph = g;
                 FindObjectOfType<DijkstraGraphVisualizer>().Refresh();
                 errorsTextField.text = "";
                 graphErrors.Clear();
+                foreach(Node n in g.nodes)
+                    n.graphIBelongTo = g;
             }
 
         }
@@ -45,19 +46,25 @@ public class DijkstraManager : MonoBehaviour {
     }
     void LoadTemplate() {
         graph = new Graph();
-        Node n1,n2,n3;
+        Node n1,n2,n3,n4;
         graph.AddNode(Vector3.zero);
         graph.AddNode(new Vector3(2, 0, 2));
         graph.AddNode(new Vector3(-1, 0, 2.7f));
+        graph.AddNode(new Vector3(2.7f, 0, -1));
         n1 = graph.nodes[0];
         n2 = graph.nodes[1];
         n3 = graph.nodes[2];
+        n4 = graph.nodes[3];
         Connection c=new Connection(n1.nodeID,n2.nodeID,false){ connectionID=0,weight=7 };
-        Connection c2=new Connection(n2.nodeID,n3.nodeID,true){ connectionID=1,weight=3};
-        Connection c3=new Connection(n1.nodeID,n3.nodeID,false){ connectionID=2,weight=2};
+        Connection c2=new Connection(n2.nodeID,n3.nodeID,true){ connectionID=1,weight=3 };
+        Connection c3=new Connection(n1.nodeID,n3.nodeID,false){ connectionID=2,weight=2 };
+        Connection c4=new Connection(n1.nodeID,n4.nodeID,false){ connectionID=3,weight=4 };
+        Connection c5=new Connection(n4.nodeID,n2.nodeID,false){ connectionID=4,weight=0 };
         graph.connections.Add(c);
         graph.connections.Add(c2);
         graph.connections.Add(c3);
+        graph.connections.Add(c4);
+        graph.connections.Add(c5);
         graph.head = 0;
         UpdateJSON();
     }

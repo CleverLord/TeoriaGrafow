@@ -16,6 +16,8 @@ public class GraphCreatorManager : MonoBehaviour
     public int indexChromatyczny=-1;
     public List<Connection> floatingConnections;
     public List<EdgeChromaAssignment> indexChromaIndexAssignment = new List<EdgeChromaAssignment>();
+    [Header("Planarnosc")]
+    public PlanarnoscSolution ps;
     [Header("Inne")]
     public GameObject nodePrefab;
     public List<GameObject> visualNodes;
@@ -34,9 +36,6 @@ public class GraphCreatorManager : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-
-    // Update is called once per frame
     void Update()
     {
         UpdateLines();
@@ -55,9 +54,13 @@ public class GraphCreatorManager : MonoBehaviour
         string content=File.ReadAllText(editorFile);
 #endif
         string[] nodes=content.Split(new char[]{ '[',']'});
-        List<string> realNodes=nodes.Where(n=>n.Length>4).ToList();
+        List<string> realNodes=nodes.ToList();
+        for(int i = 0; i < realNodes.Count(); i++)
+            realNodes[i] = realNodes[i].Replace("\r", "").Replace("\n", "");
+        //realNodes.ForEach(s=>s.Replace("\r","").Replace("\n",""));
+        realNodes=realNodes.Where(n => n.Length > 3).ToList();
 
-        simpleGraph=new SimpleGraph();
+        simpleGraph =new SimpleGraph();
 
         for (int i=0;i<realNodes.Count;i++){
             SimpleNode sn=SimpleNode.fromJSON(realNodes[i]);
@@ -75,7 +78,7 @@ public class GraphCreatorManager : MonoBehaviour
         visualNodes.Clear();
 
         List<SimpleNode> graphNodes=simpleGraph.nodes;
-        float radius=Mathf.Sqrt(graphNodes.Count);
+        float radius=Mathf.Sqrt(graphNodes.Count)*1.3f;
         float angle=360f/graphNodes.Count*Mathf.Deg2Rad;
 
         for (int i = 0; i<graphNodes.Count;i++) {
@@ -222,7 +225,7 @@ public class GraphCreatorManager : MonoBehaviour
         foreach(Node n in advGraph.nodes) {
             List<Connection> cs=new List<Connection>();
             foreach(Connection c in advGraph.connections) {
-                if(c.relatedWithNode(n.nodeID))
+                if(c.isRelated(n.nodeID))
                     cs.Add(c);
             }
             advGraph.nodesRelatedConnections.Add(n.nodeID, cs);
@@ -258,8 +261,9 @@ public class GraphCreatorManager : MonoBehaviour
             return;
         }
 
+        totalChromaIndexes--;
         while(indexChromatyczny==-1) {
-        totalChromaIndexes++;
+            totalChromaIndexes++;
             GetIndeksChromatyczySubCrt(indexChromaIndexAssignment, floatingConnections, totalChromaIndexes);
             if(totalChromaIndexes >= advGraph.connections.Count()) {
                 Debug.Log("CosZepsułem");
@@ -267,10 +271,10 @@ public class GraphCreatorManager : MonoBehaviour
             }
         }
 
-        summary= "Indeks chromatyczny wynosi";
+        summary= $"Indeks chromatyczny = {totalChromaIndexes}\n";
         foreach(EdgeChromaAssignment ech in indexChromaIndexAssignment) {
-            summary += $"From node:{ech.c.fromNode} to node: {ech.c.toNode} paint with color {ech.color}\n";
-            //summary += $"Nodes:{ech.c.fromNode} -> {ech.c.toNode} color:{ech.color}\n";
+            //summary += $"From node:{ech.c.fromNode} to node: {ech.c.toNode} paint with color {ech.color}\n";
+            summary += $"[ {ech.c.fromNode}->{ech.c.toNode}\t{ech.color}]\n";
         }
 
             //validate
@@ -326,10 +330,147 @@ public class GraphCreatorManager : MonoBehaviour
 
         return true;
     }
-    
+    #endregion
+    #region Planarnosc (porzucone)
+    public void OnCheckPlanarnosc() {
+        advGraph = simpleGraph.Upgraded();
+        PlanarnoscChecker();
+    }
+    public void PlanarnoscChecker() {
+        PlanarnoscK5Checker(advGraph);
+    }
+    public void PlanarnoscK5Checker(Graph g) {
+        int vertsPicked=5;
+
+        List<List<int>>combinations=GenerateCombinations(g,vertsPicked);
+
+        bool foundSolution=false;
+        while(!foundSolution) {
+            foreach(List<int> combination in combinations) {
+                Graph subG=FromIndexes(g,combination);
+                List<List<int>> subcombinations=GenerateCombinations(subG,5);
+                foreach(List<int> subcombination in subcombinations) {
+                    subG = FromIndexes(g, combination);
+                    ReduceGraph(subG, subcombination);
+                    foundSolution = PlanarnoscK5Validator(subG);
+                    if(foundSolution) {
+                        ps = new PlanarnoscSolution() { kg = KuratowskiGraph.K5, combination = combination, subcombination = subcombination };
+                        goto outOfWhile;
+                    }
+                }
+            }
+            vertsPicked++;
+            if(vertsPicked > g.nodes.Count) {
+                Debug.Log("To nie bedzie K5");
+                return;
+            }
+        }
+    outOfWhile:;
+
+    }
+    public List<List<int>> GenerateCombinations(Graph g, int howMuchPick) {
+        List<List<int>>ret=new List<List<int>>();
+        List<int> toPickFrom=new List<int>();
+        foreach(Node n in g.nodes)
+            toPickFrom.Add(n.nodeID);
+
+        generateSubcombinations(ret, toPickFrom, new List<int>(), howMuchPick);
+        return ret;
+    }
+    public void generateSubcombinations(List<List<int>> master,List<int> toPickFrom, List<int> current, int howMuch) {
+        if(current.Count == howMuch) {
+            master.Add(current);
+            return;
+        }
+        else if(toPickFrom.Count() == 0)
+            return;
+        else {
+            int vert=toPickFrom.First();
+            List<int> newToPickFrom= new List<int>(toPickFrom);
+            newToPickFrom.RemoveAt(0);
+            //I'm not picking it
+            generateSubcombinations(master, newToPickFrom, new List<int>(current), howMuch);
+            //I'm picking it
+            current.Add(vert);
+            generateSubcombinations(master, newToPickFrom, new List<int>(current), howMuch);
+        }
+    }
+    public bool PlanarnoscK5Validator(Graph sub) {
+        foreach(Node n in sub.nodes) {
+            if(n.myRelatedConnections.Count() != 4)
+                return false;
+        }
+        return true;
+    }
+
+    public void PlanarnoscK33Checker() {
+
+    }
+    public Graph FromIndexes(Graph oryginal, List<int> preservedNodes) {
+        Graph g=new Graph();
+        foreach(int x in preservedNodes) {
+            Node n=new Node(x,oryginal){};
+            g.nodes.Add(n);
+        }
+        foreach(Connection c in oryginal.connections) {
+            if(preservedNodes.Contains(c.fromNode) && preservedNodes.Contains(c.toNode)) {
+                Connection c2=new Connection(c.fromNode,c.toNode,false);
+                g.connections.Add(c2);
+            }
+        }
+        return g;
+    }
+    public void ReduceGraph(Graph toBeReduced, List<int> preservedNodes) {
+        List<int> verticesToBeDestroyed=new List<int>();
+        List<List<int>> verticesToBeConnected=new List<List<int>>();            //każda lista zawiera indesky nodeów do których usunięty node był podłączony
+
+        foreach(Node x in toBeReduced.nodes)
+            if(!preservedNodes.Contains(x.nodeID)) {                            //jeżeli node ma zostać zniszczony
+                verticesToBeDestroyed.Add(x.nodeID);       
+            }
+
+        foreach(int n in verticesToBeDestroyed){                            
+            List<int> verticesToBeConnectedByThisNode=new List<int>();          //zacznij zbierać wierzchołki do których ma być podłączony
+            foreach(Connection c in toBeReduced.connections) {
+                if(c.isRelated(n)) {
+                    verticesToBeConnectedByThisNode.Add(c.otherNode(n));        //dodaj tamten drugi wierzchołek
+                    toBeReduced.connections.Remove(c);
+                }
+            }
+            verticesToBeConnected.Add(verticesToBeConnectedByThisNode);
+        }
+        
+        foreach(List<int> vs in verticesToBeConnected) {
+            for(int i = 0; i < vs.Count; i++) {
+                for(int j = i + 1; j < vs.Count; i++) {
+                    Connection c =new Connection(vs[i],vs[j],false);
+                    Connection c2 =toBeReduced.connections.First(c3=>c3.isSimilar(c));
+                    if(c2==null) {
+                        toBeReduced.connections.Add(c);
+                    }
+                }
+            }
+        }
+
+
+    }
+
     #endregion
     #endregion
+    public void DebugUpgrade() {
+        advGraph = simpleGraph.Upgraded();
+        Debug.Log(JsonUtility.ToJson(advGraph));
+    }
+
 }
+public enum KuratowskiGraph { None,K5,K33};
+[System.Serializable]
+public class PlanarnoscSolution {
+    public KuratowskiGraph kg=KuratowskiGraph.None;
+    public List<int> combination;
+    public List<int> subcombination;
+}
+
 [System.Serializable]
 public class NodesColorLists {
     public List<int> n=new List<int>();
