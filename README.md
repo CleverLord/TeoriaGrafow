@@ -1,11 +1,9 @@
 # Projekt zaliczeniowy z Teorii Grafów
-##### by Krzysztof Łazarz (ISI 2021)
+#### by Krzysztof Łazarz (ISI 2021)
 ---
 
-Części nieprogramistyczne są zawarte w PDF'ie na samym wierzchu repozytorium
-
-Interesująca część kodu znajduje się [tu](../master/Assets/Dijkstra/Scripts/DijkstraCoreAlgorithm.cs), od momentu kiedy zaczynają się komentarze w kodzie (aktualnie linijka 121)
-
+##### Części nieprogramistyczne są zawarte w PDF'ie na samym wierzchu repozytorium  
+##### Interesująca część kodu znajduje się [tu](../master/Assets/Dijkstra/Scripts/DijkstraCoreAlgorithm.cs)
 ---
 ## Uruchomienie:
 ### Uruchomić projekt można na 2 sposoby:
