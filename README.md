@@ -1,7 +1,9 @@
 # Projekt zaliczeniowy z Teorii Grafów
 ##### by Krzysztof Łazarz (ISI 2021)
 ---
+
 Części nieprogramistyczne są zawarte w PDF'ie na samym wierzchu repozytorium
+
 ---
 ## Uruchomienie:
 ### Uruchomić projekt można na 2 sposoby:
