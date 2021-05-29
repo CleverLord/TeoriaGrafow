@@ -988,7 +988,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 2
   m_WholeNumbers: 0
-  m_Value: 0.6
+  m_Value: 0.59
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -3304,7 +3304,6 @@ MonoBehaviour:
     dijkstraTrack: 
     dijkstraLogs: []
     dijkstraMiniLogs: []
-    isDone: 0
     makeNextStep: 0
     fastForward: 0
   graphJson: {fileID: 211555962}
@@ -3366,7 +3365,6 @@ MonoBehaviour:
     dijkstraTrack: 
     dijkstraLogs: []
     dijkstraMiniLogs: []
-    isDone: 0
     makeNextStep: 0
     fastForward: 0
   nodeParent: {fileID: 1201297733}
@@ -4310,7 +4308,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 50
   m_WholeNumbers: 0
-  m_Value: 5
+  m_Value: 20
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
