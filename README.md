@@ -29,7 +29,8 @@ Generowanie JSON'a ręczne wcale nie jest takie przyjemne.
 Przy wczytywaniu jest regenerowana klasa Graph. Składa się ona z listy klasy Node oraz listy klasy Connection. Każdy Node posiada identyfikator oraz współrzędne w przestrzeni. Pozycja jest określona w płaszczyźnie XZ, gdzie X jest "w prawo" a Z "w górę". Zmienna ta nie jest wymagana do poprawnego działania algorytmu i nie trzeba jej podawać.
 Zmienne w Connection mówią za siebie. Nie należy robić dwóch jednostronnych połączeń między dwoma wierzchołkami. Zamiast tego należy zrobić tylko jedno z nich i ustawić flagę bidirectional na true. Zmienna Head wybiera wierzchołek początkowy z pasującym identyfikatorem.
 Przykładowy JSON:
-```{
+```
+{
     "head": 0,
     "nodes": [
         {
