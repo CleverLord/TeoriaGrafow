@@ -84,6 +84,7 @@ public class GraphCreatorManager : MonoBehaviour
         for (int i = 0; i<graphNodes.Count;i++) {
             SimpleNode node=graphNodes[i];
             GameObject bob=Instantiate(nodePrefab);
+            bob.SetActive(true);
             bob.transform.position=new Vector3(Mathf.Sin(angle*i), 0, Mathf.Cos(angle*i))*radius;
             LineRenderer lr=bob.GetComponentInChildren<LineRenderer>();
             lr.positionCount=node.connections.Count*6;
@@ -211,7 +212,7 @@ public class GraphCreatorManager : MonoBehaviour
     #endregion
     #region IndexChromatyczny
     public void OnCheckIndeksChromatyczny() {
-        liczbaChromatyczna = -1;
+        indexChromatyczny = -1;
         advGraph = simpleGraph.Upgraded();
         RegenNodeConnectionsPairs();
         new System.Threading.Thread(GetIndeksChromatyczyCrt).Start();
@@ -272,17 +273,11 @@ public class GraphCreatorManager : MonoBehaviour
         }
 
         summary= $"Indeks chromatyczny = {totalChromaIndexes}\n";
+        summary += "Połączenie \t kolor\n";
         foreach(EdgeChromaAssignment ech in indexChromaIndexAssignment) {
             //summary += $"From node:{ech.c.fromNode} to node: {ech.c.toNode} paint with color {ech.color}\n";
-            summary += $"[ {ech.c.fromNode}->{ech.c.toNode}\t{ech.color}]\n";
+            summary += $"[ {ech.c.fromNode}->{ech.c.toNode} \t{ech.color}]\n";
         }
-
-            //validate
-            //if valid and not all floating conenctions not empty
-            //make podstawienie
-            //validate
-            //if valid and not all floating conenctions not empty
-            // ... wiadomo co dalej
     }
     public void GetIndeksChromatyczySubCrt(List<EdgeChromaAssignment> assignment, List<Connection> floatingConnections,int totalChromaIndexes) {
         if(floatingConnections.Count() == 0) { //success - no free connection and assignment is valid
